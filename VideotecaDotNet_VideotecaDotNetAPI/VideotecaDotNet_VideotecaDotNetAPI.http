@@ -1,0 +1,6 @@
+@VideotecaDotNet_VideotecaDotNetAPI_HostAddress = http://localhost:5140
+
+GET {{VideotecaDotNet_VideotecaDotNetAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

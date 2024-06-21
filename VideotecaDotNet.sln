@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35013.160
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideotecaDotNet_VideotecaDotNetAPI", "VideotecaDotNet_VideotecaDotNetAPI\VideotecaDotNet_VideotecaDotNetAPI.csproj", "{81CA4181-46ED-4363-9923-931297F915AC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{81CA4181-46ED-4363-9923-931297F915AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81CA4181-46ED-4363-9923-931297F915AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81CA4181-46ED-4363-9923-931297F915AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81CA4181-46ED-4363-9923-931297F915AC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F275C6B3-DE5C-498B-8251-5D301B7AA913}
+	EndGlobalSection
+EndGlobal
