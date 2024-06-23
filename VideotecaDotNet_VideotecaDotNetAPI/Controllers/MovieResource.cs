@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.IO;
 using VideotecaDotNet_VideotecaDotNetAPI.Data;
 using VideotecaDotNet_VideotecaDotNetAPI.Dto;
-using VideotecaDotNet_VideotecaDotNetAPI.Logging;
+using VideotecaDotNet_VideotecaDotNetAPI.Models;
 
 namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
 {
@@ -10,19 +12,18 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
     [ApiController]
     public class MovieResource : ControllerBase
     {
-        private readonly ILogging _logger;
-    
-        public MovieResource(ILogging logger)
+        private readonly ApplicationDbContext _db;
+       
+        public MovieResource(ApplicationDbContext db)
         {
-            _logger = logger;
+            _db = db;
         }
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<MovieDTO>> GetAllMovies()
         {
-            _logger.Log("Getting all movies","");
-            return Ok(MovieStore.movieList);
+            return Ok(_db.Movies.ToList());
         }
 
         [HttpGet("{id:long}",Name = "GetMovie")]
@@ -33,10 +34,9 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
         {
             if(id == 0)
             {
-                _logger.Log("Get Movie Error with Id: " + id, "error");
                 return BadRequest();
             }
-            var movie = MovieStore.movieList.FirstOrDefault(u => u.Id == id);
+            var movie = _db.Movies.FirstOrDefault(u => u.Id == id);
             if(movie == null)
             {
                 return NotFound();
@@ -51,7 +51,7 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public ActionResult<MovieDTO> AddMovie([FromBody]MovieDTO movieDTO)
         {
-            if (MovieStore.movieList.FirstOrDefault(u => u.Name.ToLower() == movieDTO.Name.ToLower() && u.Disc.ToLower() == movieDTO.Disc.ToLower()) != null)
+            if (_db.Movies.FirstOrDefault(u => u.Name.ToLower() == movieDTO.Name.ToLower() && u.Disc.ToLower() == movieDTO.Disc.ToLower()) != null)
             {
                 ModelState.AddModelError("CustomError","Movie already Exists!");
                 return BadRequest(ModelState);
@@ -64,8 +64,28 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
-            movieDTO.Id = MovieStore.movieList.OrderByDescending(u => u.Id).FirstOrDefault().Id + 1;
-            MovieStore.movieList.Add(movieDTO);
+
+            Movie movie = new()
+            {
+                Id = movieDTO.Id,
+                Disc = movieDTO.Disc,
+                Name = movieDTO.Name,
+                NameFromDisc = movieDTO.NameFromDisc,
+                Genre = movieDTO.Genre,
+                Rating = movieDTO.Rating,
+                Description = movieDTO.Description,
+                Stars = movieDTO.Stars,
+                Infobar = movieDTO.Infobar,
+                Director = movieDTO.Director,
+                Duration = movieDTO.Duration,
+                Storyline = movieDTO.Storyline,
+                ReleaseDate = movieDTO.ReleaseDate,
+                Url = movieDTO.Url,
+                ImageSrc = movieDTO.ImageSrc,
+            };
+
+            _db.Movies.Add(movie);
+            _db.SaveChanges();
 
             return CreatedAtRoute("GetMovie",new { id = movieDTO.Id },movieDTO);
         }
@@ -80,12 +100,14 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
             {
                 return BadRequest();
             }
-            var movie = MovieStore.movieList.FirstOrDefault(u => u.Id == id);
+            var movie = _db.Movies.FirstOrDefault(u => u.Id == id);
             if (movie == null)
             {
                 return NotFound();
             }
-            MovieStore.movieList.Remove(movie);
+
+            _db.Movies.Remove(movie);
+            _db.SaveChanges();
 
             return NoContent();
         }
@@ -99,9 +121,28 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
             {
                 return BadRequest();
             }
-            var movie = MovieStore.movieList.FirstOrDefault(u => u.Id == id);
-            movie.Name = movieDTO.Name;
-            movie.Disc = movieDTO.Disc;
+
+            Movie model = new ()
+            {
+                Id = movieDTO.Id,
+                Disc = movieDTO.Disc,
+                Name = movieDTO.Name,
+                NameFromDisc = movieDTO.NameFromDisc,
+                Genre = movieDTO.Genre,
+                Rating = movieDTO.Rating,
+                Description = movieDTO.Description,
+                Stars = movieDTO.Stars,
+                Infobar = movieDTO.Infobar,
+                Director = movieDTO.Director,
+                Duration = movieDTO.Duration,
+                Storyline = movieDTO.Storyline,
+                ReleaseDate = movieDTO.ReleaseDate,
+                Url = movieDTO.Url,
+                ImageSrc = movieDTO.ImageSrc,
+            };
+
+            _db.Movies.Update(model);
+            _db.SaveChanges();
 
             return NoContent();
 
@@ -116,13 +157,55 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
             {
                 return BadRequest();
             }
-            var movie = MovieStore.movieList.FirstOrDefault(u => u.Id == id);
+            var movie = _db.Movies.AsNoTracking().FirstOrDefault(u => u.Id == id);
 
             if (movie == null)
             {
                 return BadRequest();
             }
-            patchDTO.ApplyTo(movie,ModelState);
+
+            MovieDTO movieDTO = new()
+            {
+                Id = movie.Id,
+                Disc = movie.Disc,
+                Name = movie.Name,
+                NameFromDisc = movie.NameFromDisc,
+                Genre = movie.Genre,
+                Rating = movie.Rating,
+                Description = movie.Description,
+                Stars = movie.Stars,
+                Infobar = movie.Infobar,
+                Director = movie.Director,
+                Duration = movie.Duration,
+                Storyline = movie.Storyline,
+                ReleaseDate = movie.ReleaseDate,
+                Url = movie.Url,
+                ImageSrc = movie.ImageSrc,
+            };
+
+            patchDTO.ApplyTo(movieDTO,ModelState);
+
+            Movie model = new()
+            {
+                Id = movieDTO.Id,
+                Disc = movieDTO.Disc,
+                Name = movieDTO.Name,
+                NameFromDisc = movieDTO.NameFromDisc,
+                Genre = movieDTO.Genre,
+                Rating = movieDTO.Rating,
+                Description = movieDTO.Description,
+                Stars = movieDTO.Stars,
+                Infobar = movieDTO.Infobar,
+                Director = movieDTO.Director,
+                Duration = movieDTO.Duration,
+                Storyline = movieDTO.Storyline,
+                ReleaseDate = movieDTO.ReleaseDate,
+                Url = movieDTO.Url,
+                ImageSrc = movieDTO.ImageSrc,
+            };
+
+            _db.Movies.Update(model);
+            _db.SaveChanges();
 
             if (!ModelState.IsValid)
             {

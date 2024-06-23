@@ -1,0 +1,42 @@
+﻿using Microsoft.EntityFrameworkCore;
+using VideotecaDotNet_VideotecaDotNetAPI.Models;
+
+namespace VideotecaDotNet_VideotecaDotNetAPI.Data
+{
+    public class ApplicationDbContext : DbContext
+    {
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) 
+            : base(options)
+        {
+        }
+
+        public DbSet<Movie> Movies { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Movie>().HasData(
+                new Movie
+                {
+                   Id = 1,
+                   Disc = "D:",
+                   Name = "Test",
+                   NameFromDisc = "Test",
+                   Genre = "Test",
+                   Rating = "Test",
+                   Description = "Test",
+                   Stars = "Test",
+                   Infobar = "Test",
+                   Director = "Test",
+                   Duration = "Test",
+                   Storyline = "Test",
+                   ReleaseDate = "Test",
+                   Url = "Test",
+                   ImageSrc = "Test",
+                   CreatedDate = DateTime.Now,
+                   UpdatedDate = DateTime.Now
+                }
+                );
+        }
+
+    }
+}

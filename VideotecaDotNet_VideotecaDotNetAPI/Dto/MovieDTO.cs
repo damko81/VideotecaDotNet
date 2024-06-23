@@ -21,6 +21,5 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Dto
         public string ReleaseDate { get; set; }
         public string Url { get; set; }
         public string ImageSrc { get; set; }
-        public DateTime CreatedDate { get; set; }
     }
 }
