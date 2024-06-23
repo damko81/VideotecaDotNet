@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.IO;
 using VideotecaDotNet_VideotecaDotNetAPI.Data;
 using VideotecaDotNet_VideotecaDotNetAPI.Dto;
 using VideotecaDotNet_VideotecaDotNetAPI.Models;
