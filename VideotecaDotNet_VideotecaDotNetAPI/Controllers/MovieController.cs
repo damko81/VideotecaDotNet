@@ -4,16 +4,17 @@ using Microsoft.EntityFrameworkCore;
 using VideotecaDotNet_VideotecaDotNetAPI.Data;
 using VideotecaDotNet_VideotecaDotNetAPI.Dto;
 using VideotecaDotNet_VideotecaDotNetAPI.Models;
+using VideotecaDotNet_VideotecaDotNetAPI.Service;
 
 namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
 {
     [Route("api/MovieAPI")]
     [ApiController]
-    public class MovieResource : ControllerBase
+    public class MovieController : ControllerBase
     {
         private readonly ApplicationDbContext _db;
        
-        public MovieResource(ApplicationDbContext db)
+        public MovieController(ApplicationDbContext db)
         {
             _db = db;
         }
@@ -87,6 +88,44 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
             _db.SaveChanges();
 
             return CreatedAtRoute("GetMovie",new { id = movieDTO.Id },movieDTO);
+        }
+
+        [HttpPost("{disc}", Name = "LoadMovies")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult LoadMovies(string disc)
+        {
+            string discTmp = disc.Replace("!","\\");
+            List<Movie> movies = BusinessService.LoadMovies(discTmp);
+            foreach (Movie movie in movies)
+            {
+                _db.Movies.Add(movie);
+                _db.SaveChanges();
+            }
+
+            return NoContent();
+        }
+
+        [HttpDelete("{disc}", Name = "DeleteMovieByDisc")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IActionResult DeleteMovieByDisc(string disc)
+        {
+            string discTmp = disc.Replace("!", "\\");
+            var ids = from m in _db.Movies where m.Disc == discTmp select m.Id;
+                
+            if (ids == null)
+            {
+                return NotFound();
+            }
+
+            foreach (long id in ids)
+            {
+                DeleteMovie(id);
+            }
+
+            return NoContent();
         }
 
         [HttpDelete("{id:long}", Name = "DeleteMovie")]
