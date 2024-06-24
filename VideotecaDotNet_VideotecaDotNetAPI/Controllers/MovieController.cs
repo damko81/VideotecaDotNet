@@ -19,7 +19,7 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
             _db = db;
         }
 
-        [HttpGet]
+        [HttpGet(Name = "GetAllMovies")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<MovieDTO>> GetAllMovies()
         {
