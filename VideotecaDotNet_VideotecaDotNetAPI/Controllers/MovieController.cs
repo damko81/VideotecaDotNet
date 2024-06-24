@@ -98,7 +98,7 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
         {
             string discTmp = disc.Replace("!","\\");
         
-            List<Movie> movies = BusinessService.LoadMovies(discTmp);
+            List<Movie> movies = BusinessService.LoadMovies(discTmp); //TODO: Potrebno omejiti klice na IMDBApiLib, če že obstaja v bazi.
             var moviesName = from m in _db.Movies where m.Disc == discTmp select m.Name;
 
             foreach (Movie movie in movies)
