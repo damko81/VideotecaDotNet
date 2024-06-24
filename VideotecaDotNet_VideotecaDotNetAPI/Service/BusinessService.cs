@@ -8,14 +8,14 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Service
         public static List<Movie> LoadMovies(string disc)
         {
             List<Movie> movies = new List<Movie>();
-            Dictionary<string, string> directories = ListOfDirectories(disc);
+            List<string> directories = ListOfDirectories(disc);
 
-            foreach (var directory in directories)
+            foreach (string directory in directories)
             {
                 Movie movie = new Movie();
                 movie.Disc = disc;
-                movie.NameFromDisc = directory.Key;
-                movie.Name = directory.Value;
+                movie.NameFromDisc = directory;
+                movie.Name = directory;
               
                 movies.Add(movie);
             }
@@ -23,16 +23,16 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Service
             return movies;
         }
 
-        private static Dictionary<string, string> ListOfDirectories(string disc)
+        private static List<string> ListOfDirectories(string disc)
         {
             string movieKey = "";
-            Dictionary<string,string> directories = new Dictionary<string,string>();
+            List<string> directories = new List<string>();
 
             DirectoryInfo folder = new DirectoryInfo(disc);
-            foreach (DirectoryInfo directory in folder.GetDirectories())
+            foreach (DirectoryInfo directory in folder.GetDirectories().Where(dir => !dir.Attributes.HasFlag(FileAttributes.Hidden)))
             {
                 movieKey = RemoveSpecialChar(directory.Name);
-                directories.Add(movieKey, directory.Name);
+                directories.Add(movieKey);
             }
 
             return directories;

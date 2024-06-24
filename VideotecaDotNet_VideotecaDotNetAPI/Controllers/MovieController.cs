@@ -97,11 +97,19 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
         public IActionResult LoadMovies(string disc)
         {
             string discTmp = disc.Replace("!","\\");
+        
             List<Movie> movies = BusinessService.LoadMovies(discTmp);
+            var moviesName = from m in _db.Movies where m.Disc == discTmp select m.Name;
+
             foreach (Movie movie in movies)
             {
-                _db.Movies.Add(movie);
-                _db.SaveChanges();
+                var movieName = moviesName.Where(m => m == movie.Name).FirstOrDefault();
+
+                if (movieName == null)
+                {
+                    _db.Movies.Add(movie);
+                    _db.SaveChanges();
+                }
             }
 
             return NoContent();
