@@ -1,7 +1,5 @@
 ﻿using IMDbApiLib;
-using System.Text.RegularExpressions;
 using VideotecaDotNet_VideotecaDotNetAPI.Models;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace VideotecaDotNet_VideotecaDotNetAPI.Service
 {
@@ -9,18 +7,22 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Service
     {
         private static ApiLib _apiLib = new ApiLib("k_igrt8re6");
 
-        public static List<Movie> LoadMovies(string disc)
+        public static List<Movie> LoadMovies(string disc, List<string> namesFromDiscDbList)
         {
             List<Movie> movies = new List<Movie>();
-            List<string> directories = ListOfDirectories(disc);
+
+            List<string> namesFromDisc = ListOfDirectories(disc);
             
-            foreach (string directory in directories)
+            foreach (string nameFromDisc in namesFromDisc)
             {
-                Movie movie = GetMoviesByNameFromDisc(directory);
-                movie.Disc = disc;
-                movie.NameFromDisc = directory;
-            
-                movies.Add(movie);
+                if (!namesFromDiscDbList.Exists(x => x == nameFromDisc))
+                {
+                    Movie movie = GetMoviesByNameFromDisc(nameFromDisc);
+                    movie.Disc = disc;
+                    movie.NameFromDisc = nameFromDisc;
+
+                    movies.Add(movie);
+                }
             }
 
             return movies;
@@ -33,16 +35,28 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Service
 
             if (string.IsNullOrEmpty(result.ErrorMessage) && result.Results.Count > 0)
             {
-                string imdbId = result.Results.First().Id;
+                string imdbId = "";
+
+                if (result.Results.Exists(x => x.Title == nameFromDisc))
+                {
+                    imdbId = result.Results.First(u => u.Title == nameFromDisc).Id;
+                }
+                else
+                {
+                    imdbId = result.Results.First().Id;
+                }   
+
                 var titleData = _apiLib.TitleAsync(imdbId).Result;
 
-                string Name = titleData.FullTitle;
-                string Genre = titleData.Genres;
-                string Rating = titleData.IMDbRating;
-
-                movie.Name = Name;
-                movie.Genre = Genre;
-                movie.Rating = Rating;
+                movie.Name = titleData.Title;
+                movie.Genre = titleData.Genres;
+                movie.Rating = titleData.IMDbRating;
+                movie.Description = titleData.Keywords;
+                movie.Stars = titleData.Stars;
+                movie.Director = titleData.Directors;
+                movie.Duration = titleData.RuntimeStr;
+                movie.ReleaseDate = titleData.ReleaseDate;
+                movie.ImageSrc = titleData.Image;
             }
 
             return movie;

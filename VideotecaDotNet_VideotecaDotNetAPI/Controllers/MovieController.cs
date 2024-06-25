@@ -98,18 +98,14 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
         {
             string discTmp = disc.Replace("!","\\");
         
-            List<Movie> movies = BusinessService.LoadMovies(discTmp); //TODO: Potrebno omejiti klice na IMDBApiLib, če že obstaja v bazi.
-            var moviesName = from m in _db.Movies where m.Disc == discTmp select m.Name;
+            var namesFromDiscDb = from m in _db.Movies where m.Disc == discTmp select m.NameFromDisc;
+            List<string> namesFromDiscDbList = namesFromDiscDb.ToList();
+            List<Movie> movies = BusinessService.LoadMovies(discTmp, namesFromDiscDbList);
 
             foreach (Movie movie in movies)
             {
-                var movieName = moviesName.Where(m => m == movie.Name).FirstOrDefault();
-
-                if (movieName == null)
-                {
-                    _db.Movies.Add(movie);
-                    _db.SaveChanges();
-                }
+                _db.Movies.Add(movie);
+                _db.SaveChanges();
             }
 
             return NoContent();
