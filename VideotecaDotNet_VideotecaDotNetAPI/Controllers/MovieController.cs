@@ -167,6 +167,7 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public ActionResult<MovieDTO> UpdateMovie([FromBody] MovieDTO movieDTO, long id)
         {
+           
             if (movieDTO == null || id != movieDTO.Id)
             {
                 return BadRequest();
@@ -193,7 +194,7 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
 
             _db.Movies.Update(model);
             _db.SaveChanges();
-
+           
             return NoContent();
 
         }
