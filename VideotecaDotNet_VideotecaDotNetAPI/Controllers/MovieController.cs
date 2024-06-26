@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.JsonPatch;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VideotecaDotNet_VideotecaDotNetAPI.Data;
@@ -19,6 +20,7 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
             _db = db;
         }
 
+        [EnableCors("BasicPolicy")]
         [HttpGet(Name = "GetAllMovies")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<MovieDTO>> GetAllMovies()

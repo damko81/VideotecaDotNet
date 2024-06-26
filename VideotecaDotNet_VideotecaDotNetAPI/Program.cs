@@ -4,6 +4,17 @@ using VideotecaDotNet_VideotecaDotNetAPI.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("BasicPolicy",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:4200")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+        });
+});
+
 // Add services to the container.
 
 builder.Services.AddDbContext<ApplicationDbContext>(option => {
@@ -23,6 +34,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseRouting();
+
+app.UseCors();
 
 app.UseAuthorization();
 
