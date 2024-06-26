@@ -28,6 +28,7 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
             return Ok(_db.Movies.ToList());
         }
 
+        [EnableCors("BasicPolicy")]
         [HttpGet("{id:long}",Name = "GetMovie")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -47,6 +48,7 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
             return Ok(movie);
         }
 
+        [EnableCors("BasicPolicy")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -92,6 +94,7 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
             return CreatedAtRoute("GetMovie",new { id = movieDTO.Id },movieDTO);
         }
 
+        [EnableCors("BasicPolicy")]
         [HttpPost("{disc}", Name = "LoadMovies")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -113,6 +116,7 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
             return NoContent();
         }
 
+        [EnableCors("BasicPolicy")]
         [HttpDelete("{disc}", Name = "DeleteMovieByDisc")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -134,6 +138,7 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
             return NoContent();
         }
 
+        [EnableCors("BasicPolicy")]
         [HttpDelete("{id:long}", Name = "DeleteMovie")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -156,6 +161,7 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
             return NoContent();
         }
 
+        [EnableCors("BasicPolicy")]
         [HttpPut("{id:long}", Name = "UpdateMovie")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -192,6 +198,7 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
 
         }
 
+        [EnableCors("BasicPolicy")]
         [HttpPatch("{id:long}", Name = "UpdatePartialMovie")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
