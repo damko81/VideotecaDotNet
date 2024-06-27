@@ -11,6 +11,7 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Data
         }
 
         public DbSet<Movie> Movies { get; set; }
+        public DbSet<Users> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -35,7 +36,17 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Data
                    CreatedDate = DateTime.Now,
                    UpdatedDate = DateTime.Now
                 }
-                );
+             );
+
+            modelBuilder.Entity<Users>().HasData(
+               new Users
+               {
+                   Id = 1,
+                   Name = "Test",
+                   UserName = "Test",
+                   Password = "Test"
+               }
+            );
         }
 
     }
