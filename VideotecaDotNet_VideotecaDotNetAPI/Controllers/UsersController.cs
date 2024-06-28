@@ -50,6 +50,39 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
         }
 
         [EnableCors("BasicPolicy")]
+        [HttpPost("LoginUsersRet")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<UsersDTO> LoginUsersRet([FromBody] LoginDTO loginDTO)
+        {
+            var user = _db.Users.FirstOrDefault(u => u.UserName == loginDTO.UserName);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            string password = loginDTO.Password;
+            string encodedPassword = user.Password;
+            bool isPwdRight = BusinessService.DecodeFrom64(encodedPassword).Equals(password);
+
+            if (!isPwdRight) {
+
+                return BadRequest();
+            }
+
+            UsersDTO userDTO = new()
+            {
+                Id = user.Id,
+                Name = user.Name,
+                UserName = user.UserName,
+                Password = user.Password
+            };
+
+            return Ok(userDTO);
+        }
+
+        [EnableCors("BasicPolicy")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
