@@ -157,7 +157,7 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
                 Id = usersDTO.Id,
                 Name = usersDTO.Name,
                 UserName = usersDTO.UserName,
-                Password = usersDTO.Password
+                Password = BusinessService.EncodePasswordToBase64(usersDTO.Password)
             };
 
             _db.Users.Update(model);
