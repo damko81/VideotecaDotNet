@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using VideotecaDotNet_VideotecaDotNetAPI.Data;
 using VideotecaDotNet_VideotecaDotNetAPI.Dto;
 using VideotecaDotNet_VideotecaDotNetAPI.Models;
+using VideotecaDotNet_VideotecaDotNetAPI.Service;
 
 namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
 {
@@ -74,7 +75,7 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
                 Id = usersDTO.Id,
                 Name = usersDTO.Name,
                 UserName = usersDTO.UserName,
-                Password = usersDTO.Password
+                Password = BusinessService.EncodePasswordToBase64(usersDTO.Password)
             };
 
             _db.Users.Add(user);
