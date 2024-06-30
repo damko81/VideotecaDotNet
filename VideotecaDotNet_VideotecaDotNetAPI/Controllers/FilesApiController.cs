@@ -41,6 +41,17 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
                 file.CopyTo(stream);
             }
 
+            FilesApi fileApi = new()
+            {
+                Name = file.FileName,
+                Path = path,
+                Description = "",
+                Size = file.Length
+            };
+
+            _db.FilesApi.Add(fileApi);
+            _db.SaveChanges();
+
             return NoContent();
         }
 
