@@ -12,6 +12,7 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Data
 
         public DbSet<Movie> Movies { get; set; }
         public DbSet<Users> Users { get; set; }
+        public DbSet<FilesApi> FilesApi { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -47,7 +48,18 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Data
                    Password = "Test"
                }
             );
-        }
 
+            modelBuilder.Entity<FilesApi>().HasData(
+             new FilesApi
+             {
+                 Id = 1,
+                 Name = "Test",
+                 Path = "Test",
+                 Description = "Test",
+                 Size = 123
+             }
+          );
+        }
+        
     }
 }
