@@ -81,6 +81,29 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
         }
 
         [EnableCors("BasicPolicy")]
+        [HttpPost("Export")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult Export()
+        {
+            string path = "download/";
+
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            path = path + "Filmi.xml";
+
+            using (var stream = System.IO.File.Create(path))
+            {
+                 // TODO: Load all movies to xml file.
+            }
+
+            return NoContent();
+        }
+
+        [EnableCors("BasicPolicy")]
         [HttpDelete("{name}", Name = "Delete")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
