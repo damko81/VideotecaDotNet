@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using System.IO;
 using VideotecaDotNet_VideotecaDotNetAPI.Data;
 using VideotecaDotNet_VideotecaDotNetAPI.Dto;
 using VideotecaDotNet_VideotecaDotNetAPI.Models;
@@ -23,7 +24,32 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<FilesApiDTO>> GetFiles()
         {
-            return Ok(_db.FilesApi.ToList());
+            var filesApi = from f in _db.FilesApi where f.Kind.Equals("upload") select f;
+
+            return Ok(filesApi.ToList());
+        }
+
+        [EnableCors("BasicPolicy")]
+        [HttpGet("Download")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult<IEnumerable<FilesApiDTO>> Download()
+        {
+            var filesApi = _db.FilesApi.FirstOrDefault(f => f.Kind.Equals("download"));
+
+            FilesApiDTO fileApi = new()
+            {
+                Name = filesApi.Name,
+                Path = filesApi.Path,
+                Description = filesApi.Description,
+                Kind = filesApi.Kind,
+                Size = filesApi.Size,
+                Data = filesApi.Data,
+                CreatedDate = filesApi.CreatedDate
+            };
+            List<FilesApiDTO> list = new List<FilesApiDTO>();
+            list.Add(fileApi);
+
+            return Ok(list);
         }
 
         [EnableCors("BasicPolicy")]
@@ -37,7 +63,7 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
             {
                 return BadRequest();
             }
-            var filesApi = from f in _db.FilesApi where f.Name.Contains(username + '_') select f;
+            var filesApi = from f in _db.FilesApi where f.Name.Contains(username + '_') && f.Kind.Equals("upload") select f;
 
             return Ok(filesApi.ToList());
         }
@@ -48,9 +74,9 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult Upload(IFormFile file)
         {
-            string path = "uploads/";
+            string path = "upload/";
 
-            if (file == null)
+            if (file == null || file.Length == 0)
             {
                 return BadRequest();
             }
@@ -58,24 +84,30 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
             {
                 Directory.CreateDirectory(path);
             }
-
             path = path + file.FileName;
-
             using (var stream = System.IO.File.Create(path))
             {
                 file.CopyTo(stream);
             }
 
-            FilesApi fileApi = new()
+            using (var memorySteam = new MemoryStream())
             {
-                Name = file.FileName,
-                Path = path,
-                Description = "Upload",
-                Size = file.Length
-            };
+                file.CopyTo(memorySteam);
 
-            _db.FilesApi.Add(fileApi);
-            _db.SaveChanges();
+                FilesApi fileApi = new()
+                {
+                    Name = file.FileName,
+                    Path = path,
+                    Description = "",
+                    Kind = "upload",
+                    Size = file.Length,
+                    Data = memorySteam.ToArray()
+                };
+
+                _db.FilesApi.Add(fileApi);
+                _db.SaveChanges();
+
+            }
 
             return NoContent();
         }
@@ -99,6 +131,19 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
             {
                  // TODO: Load all movies to xml file.
             }
+
+            FilesApi fileApi = new()
+            {
+                Name = "Filmi.xml",
+                Path = path,
+                Description = "",
+                Kind = "download",
+                Size = 0,
+                Data = new byte[] { 0x20 }
+            };
+
+            _db.FilesApi.Add(fileApi);
+            _db.SaveChanges();
 
             return NoContent();
         }

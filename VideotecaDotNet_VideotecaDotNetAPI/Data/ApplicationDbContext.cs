@@ -55,8 +55,10 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Data
                  Id = 1,
                  Name = "Test",
                  Path = "Test",
+                 Kind = "Test",
                  Description = "Test",
-                 Size = 123
+                 Size = 123,
+                 Data = new byte[] { 0x20 }
              }
           );
         }
