@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using VideotecaDotNet_VideotecaDotNetAPI.Data;
 using VideotecaDotNet_VideotecaDotNetAPI.Dto;
 using VideotecaDotNet_VideotecaDotNetAPI.Models;
@@ -15,6 +16,30 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
         public FilesApiController(ApplicationDbContext db)
         {
             _db = db;
+        }
+
+        [EnableCors("BasicPolicy")]
+        [HttpGet(Name = "GetFiles")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult<IEnumerable<FilesApiDTO>> GetFiles()
+        {
+            return Ok(_db.FilesApi.ToList());
+        }
+
+        [EnableCors("BasicPolicy")]
+        [HttpGet("{username}", Name = "GetForLoginFiles")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<IEnumerable<FilesApiDTO>> GetForLoginFiles(string username)
+        {
+            if (username.IsNullOrEmpty())
+            {
+                return BadRequest();
+            }
+            var filesApi = from f in _db.FilesApi where f.Name.Contains(username + '_') select f;
+
+            return Ok(filesApi.ToList());
         }
 
         [EnableCors("BasicPolicy")]
@@ -45,7 +70,7 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
             {
                 Name = file.FileName,
                 Path = path,
-                Description = "",
+                Description = "Upload",
                 Size = file.Length
             };
 
@@ -54,6 +79,8 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
 
             return NoContent();
         }
+
+
 
     }
 
