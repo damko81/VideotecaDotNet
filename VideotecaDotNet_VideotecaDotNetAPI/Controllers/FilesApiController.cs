@@ -80,6 +80,28 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
             return NoContent();
         }
 
+        [EnableCors("BasicPolicy")]
+        [HttpDelete("{name}", Name = "Delete")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult Delete(string name)
+        {
+            if (name.IsNullOrEmpty())
+            {
+                return BadRequest();
+            }
+            var filesApi = _db.FilesApi.FirstOrDefault(f => f.Name == name);
+            if (filesApi == null)
+            {
+                return NotFound();
+            }
+
+            _db.FilesApi.Remove(filesApi);
+            _db.SaveChanges();
+
+            return NoContent();
+        }
 
 
     }
