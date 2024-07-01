@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IO;
+using System.Reflection.Metadata;
 using VideotecaDotNet_VideotecaDotNetAPI.Data;
 using VideotecaDotNet_VideotecaDotNetAPI.Dto;
 using VideotecaDotNet_VideotecaDotNetAPI.Models;
@@ -24,9 +25,27 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<FilesApiDTO>> GetFiles()
         {
-            var filesApi = from f in _db.FilesApi where f.Kind.Equals("upload") select f;
+          
+            var filesApi = _db.FilesApi.Where(fields => fields.Kind.Equals("upload"))
+                                       .GroupBy(fields => fields.Name)
+                                       .Select(fields => fields
+                                                    .OrderByDescending(x => x.Id)
+                                                    .Select(x => new
+                                                    {
+                                                        Id = x.Id,
+                                                        Name = x.Name,
+                                                        Path = x.Path,
+                                                        Kind = x.Kind,
+                                                        Description = x.Description,
+                                                        Size = x.Size,
+                                                        Data = x.Data,
+                                                        CreatedDate = x.CreatedDate
+                                                    })
+                                                    .First()
+                                              )
+                                       .ToList();
 
-            return Ok(filesApi.ToList());
+            return Ok(filesApi);
         }
 
         [EnableCors("BasicPolicy")]
@@ -34,22 +53,12 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<FilesApiDTO>> Download()
         {
-            var filesApi = _db.FilesApi.FirstOrDefault(f => f.Kind.Equals("download"));
+            var filesApi = _db.FilesApi.Where(f => f.Kind.Equals("download"))
+                                       .OrderByDescending(f => f.Id)
+                                       .Take(1)
+                                       .ToList();
 
-            FilesApiDTO fileApi = new()
-            {
-                Name = filesApi.Name,
-                Path = filesApi.Path,
-                Description = filesApi.Description,
-                Kind = filesApi.Kind,
-                Size = filesApi.Size,
-                Data = filesApi.Data,
-                CreatedDate = filesApi.CreatedDate
-            };
-            List<FilesApiDTO> list = new List<FilesApiDTO>();
-            list.Add(fileApi);
-
-            return Ok(list);
+            return Ok(filesApi);
         }
 
         [EnableCors("BasicPolicy")]
@@ -63,9 +72,13 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
             {
                 return BadRequest();
             }
-            var filesApi = from f in _db.FilesApi where f.Name.Contains(username + '_') && f.Kind.Equals("upload") select f;
 
-            return Ok(filesApi.ToList());
+            var filesApi = _db.FilesApi.Where(f => f.Name.Contains(username + '_') && f.Kind.Equals("upload"))
+                                       .OrderByDescending(f => f.Id)
+                                       .Take(1)
+                                       .ToList();
+
+            return Ok(filesApi);
         }
 
         [EnableCors("BasicPolicy")]
@@ -149,17 +162,17 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
         }
 
         [EnableCors("BasicPolicy")]
-        [HttpDelete("{name}", Name = "Delete")]
+        [HttpDelete("{id:long}", Name = "Delete")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult Delete(string name)
+        public IActionResult Delete(long id)
         {
-            if (name.IsNullOrEmpty())
+            if (id == 0)
             {
                 return BadRequest();
             }
-            var filesApi = _db.FilesApi.FirstOrDefault(f => f.Name == name);
+            var filesApi = _db.FilesApi.FirstOrDefault(f => f.Id == id);
             if (filesApi == null)
             {
                 return NotFound();
