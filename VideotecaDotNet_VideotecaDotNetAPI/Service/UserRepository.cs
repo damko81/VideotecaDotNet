@@ -1,22 +1,30 @@
 ﻿
+using VideotecaDotNet_VideotecaDotNetAPI.Data;
 using VideotecaDotNet_VideotecaDotNetAPI.Models;
 
 namespace VideotecaDotNet_VideotecaDotNetAPI.Service
 {
     public class UserRepository : IUserRepository
     {
-        private List<Users> _users = new List<Users>
+        private readonly ApplicationDbContext _db;
+        private List<Users> _users = new List<Users>();
+
+        public UserRepository(ApplicationDbContext db)
         {
-            new Users
+            _db = db;
+            List<Users> users = _db.Users.ToList();
+            foreach (Users user in users)
             {
-                Id = 6, Name="Damjan Koscak", UserName = "damko81", Password = "biceps"
-            },
-            
-            new Users
-            {
-                Id = 5, Name="Martina Koscak", UserName = "martinka", Password = "martinka"
+                Users u = new Users();
+                u.Id = user.Id;
+                u.Name = user.Name;
+                u.UserName = user.UserName;
+                u.Password = BusinessService.DecodeFrom64(user.Password);
+
+                _users.Add(u);
             }
-        };
+        }
+
         public async Task<bool> Authenticate(string username, string password)
         {
             if (await Task.FromResult(_users.SingleOrDefault(x => x.UserName == username && x.Password == password)) != null)
