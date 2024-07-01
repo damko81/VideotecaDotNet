@@ -1,12 +1,9 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using System.IO;
-using System.Reflection.Metadata;
 using VideotecaDotNet_VideotecaDotNetAPI.Data;
 using VideotecaDotNet_VideotecaDotNetAPI.Dto;
 using VideotecaDotNet_VideotecaDotNetAPI.Models;
-using VideotecaDotNet_VideotecaDotNetAPI.Service;
 
 namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
 {
