@@ -87,22 +87,11 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult Upload(IFormFile file)
         {
-            string path = "upload/";
-
             if (file == null || file.Length == 0)
             {
                 return BadRequest();
             }
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
-            path = path + file.FileName;
-            using (var stream = System.IO.File.Create(path))
-            {
-                file.CopyTo(stream);
-            }
-
+           
             using (var memorySteam = new MemoryStream())
             {
                 file.CopyTo(memorySteam);
@@ -110,7 +99,7 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
                 FilesApi fileApi = new()
                 {
                     Name = file.FileName,
-                    Path = path,
+                    Path = "",
                     Description = "",
                     Kind = "upload",
                     Size = file.Length,
@@ -119,7 +108,6 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
 
                 _db.FilesApi.Add(fileApi);
                 _db.SaveChanges();
-
             }
 
             return NoContent();
@@ -131,24 +119,12 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult Export()
         {
-            string path = "download/";
-
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
-
-            path = path + "Filmi.xml";
-
-            using (var stream = System.IO.File.Create(path))
-            {
-                 // TODO: Load all movies to xml file.
-            }
-
+            // TODO: Load all movies to xml file.
+            
             FilesApi fileApi = new()
             {
                 Name = "Filmi.xml",
-                Path = path,
+                Path = "",
                 Description = "",
                 Kind = "download",
                 Size = 0,
