@@ -1,8 +1,10 @@
 ﻿
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using VideotecaDotNet_VideotecaDotNetAPI.Data;
 using VideotecaDotNet_VideotecaDotNetAPI.Dto;
 using VideotecaDotNet_VideotecaDotNetAPI.Models;
@@ -15,10 +17,20 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
     public class UsersController : ControllerBase
     {
         private readonly ApplicationDbContext _db;
+        private readonly IUserRepository _userRepository;
 
-        public UsersController(ApplicationDbContext db)
+        public UsersController(ApplicationDbContext db, IUserRepository userRepository)
         {
             _db = db;
+            _userRepository = userRepository;
+        }
+
+        [EnableCors("BasicPolicy")]
+        [HttpGet("Authenticate")]
+        [Authorize]
+        public async Task<List<string>> Get()
+        {
+            return await _userRepository.GetUserNames();
         }
 
         [EnableCors("BasicPolicy")]
