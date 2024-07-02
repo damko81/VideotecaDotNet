@@ -100,7 +100,7 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public ActionResult<UsersDTO> AddUser([FromBody] UsersDTO usersDTO)
         {
-            if (_db.Users.FirstOrDefault(u => u.UserName.ToLower() == usersDTO.UserName.ToLower()) != null)
+            if (_db.Users.FirstOrDefault(u => u.UserName.ToLower() == usersDTO.UserName.ToLower()) != null || usersDTO.UserName.ToLower() == "admin")
             {
                 ModelState.AddModelError("CustomError", "UserName already Exists!");
                 return BadRequest(ModelState);
