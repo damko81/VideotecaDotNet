@@ -7,7 +7,7 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Service
     public class UserRepository : IUserRepository
     {
         private readonly ApplicationDbContext _db;
-        private List<Users> _users = new List<Users>();
+        private List<Users> _users = new List<Users>() { new Users {UserName="admin", Password="password"} };
 
         public UserRepository(ApplicationDbContext db)
         {
