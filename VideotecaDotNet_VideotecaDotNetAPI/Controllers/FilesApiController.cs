@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using VideotecaDotNet_VideotecaDotNetAPI.Data;
 using VideotecaDotNet_VideotecaDotNetAPI.Dto;
 using VideotecaDotNet_VideotecaDotNetAPI.Models;
+using VideotecaDotNet_VideotecaDotNetAPI.Service;
 
 namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
 {
@@ -79,6 +80,32 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
         }
 
         [EnableCors("BasicPolicy")]
+        [HttpPost("LoadMoviesFromXml/{id:long}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult LoadMoviesFromXml(long id)
+        {
+            if (id == 0)
+            {
+                return BadRequest();
+            }
+
+            List<Movie> moviesDb = _db.Movies.ToList();
+            List<Movie> movies = XMLParser.ReadXML(id);
+
+            foreach (Movie movie in movies)
+            {
+                if(!moviesDb.Exists(x => x.NameFromDisc == movie.NameFromDisc && x.Disc == movie.Disc))
+                {
+                    _db.Movies.Add(movie);
+                    _db.SaveChanges();
+                }
+            }
+
+            return NoContent();
+        }
+
+        [EnableCors("BasicPolicy")]
         [HttpPost("Upload")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -116,8 +143,7 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult Export()
         {
-            // TODO: Load all movies to xml file.
-            
+            // TODO: Save all movies from _db to xml file.
             FilesApi fileApi = new()
             {
                 Name = "Filmi.xml",
