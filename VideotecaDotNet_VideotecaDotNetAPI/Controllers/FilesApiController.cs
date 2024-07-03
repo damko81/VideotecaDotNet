@@ -90,9 +90,10 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
                 return BadRequest();
             }
 
+            var file = _db.FilesApi.FirstOrDefault(u => u.Id == id);
+            List<Movie> movies = XMLParser.ReadXML(file.Data);
             List<Movie> moviesDb = _db.Movies.ToList();
-            List<Movie> movies = XMLParser.ReadXML(id);
-
+           
             foreach (Movie movie in movies)
             {
                 if(!moviesDb.Exists(x => x.NameFromDisc == movie.NameFromDisc && x.Disc == movie.Disc))
