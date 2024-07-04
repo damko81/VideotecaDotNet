@@ -1,4 +1,8 @@
 ﻿using IMDbApiLib;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.Net;
 using VideotecaDotNet_VideotecaDotNetAPI.Models;
 
 namespace VideotecaDotNet_VideotecaDotNetAPI.Service
@@ -27,7 +31,6 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Service
 
             return movies;
         }
-
         private static Movie GetMoviesByNameFromDisc(string nameFromDisc)
         {
             Movie movie = new Movie();
@@ -61,7 +64,6 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Service
 
             return movie;
         }
-
         private static List<string> ListOfDirectories(string disc)
         {
             string movieKey = "";
@@ -76,7 +78,6 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Service
 
             return directories;
         }
-
         private static string RemoveSpecialChar(string name)
         {
             string nameTmp = name.Replace(".", " ");
@@ -91,7 +92,6 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Service
 
             return nameTmp;
         }
-
         public static string EncodePasswordToBase64(string password)
         {
             try
@@ -106,7 +106,6 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Service
                 throw new Exception("Error in base64Encode" + ex.Message);
             }
         }
-
         public static string DecodeFrom64(string encodedData)
         {
             System.Text.UTF8Encoding encoder = new System.Text.UTF8Encoding();
@@ -118,6 +117,26 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Service
             string result = new String(decoded_char);
             return result;
         }
+        public static byte[] ImageToByte(string imageUrl)
+        {
+            byte[] imageBytes;
+            using (WebClient client = new WebClient())
+            {
+                imageBytes = client.DownloadData(imageUrl);
+            }
 
+            using var memoryStream = new MemoryStream(imageBytes);
+            using var originalImage = new Bitmap(memoryStream);
+            var resized = new Bitmap(380, 330);
+            using var graphics = Graphics.FromImage(resized);
+            graphics.CompositingQuality = CompositingQuality.HighSpeed;
+            graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            graphics.CompositingMode = CompositingMode.SourceCopy;
+            graphics.DrawImage(originalImage, 0, 0, 380, 330);
+            using var stream = new MemoryStream();
+            resized.Save(stream, ImageFormat.Jpeg);
+
+            return stream.ToArray();
+        }
     }
 }
