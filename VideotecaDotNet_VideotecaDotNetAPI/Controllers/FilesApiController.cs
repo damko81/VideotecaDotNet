@@ -144,7 +144,13 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult Export()
         {
-            // TODO: Save all movies from _db to xml file.
+            List<Movie> movies = _db.Movies.OrderBy(m => m.Disc).ThenBy(m => m.NameFromDisc).ToList();
+            if (movies == null)
+            {
+                return BadRequest();
+            }
+
+            byte[] data = XMLParser.CreateXML(movies);
             FilesApi fileApi = new()
             {
                 Name = "Filmi.xml",
@@ -152,7 +158,7 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Controllers
                 Description = "",
                 Kind = "download",
                 Size = 0,
-                Data = new byte[] { 0x20 }
+                Data = data
             };
 
             _db.FilesApi.Add(fileApi);

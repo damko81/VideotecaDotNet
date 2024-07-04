@@ -1,12 +1,92 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Text;
 using System.Xml;
 using VideotecaDotNet_VideotecaDotNetAPI.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace VideotecaDotNet_VideotecaDotNetAPI.Service
 {
     public static class XMLParser
     {
+
+        public static byte[] CreateXML(List<Movie> movies)
+        {
+            var sb = new StringBuilder();
+            using var xmlWriter = XmlWriter.Create(sb,new XmlWriterSettings { Indent = true });
+
+            string disc = "";
+            string nameFromDisc = "";
+
+            xmlWriter.WriteStartElement("filmi");
+            int i = 0;
+            while (i < movies.Count) {
+
+                Movie f = movies[i];
+
+                if (!f.Disc.ToLower().Equals(disc.ToLower()))
+                {
+                    disc = f.Disc;
+                    xmlWriter.WriteStartElement("disc");
+                    xmlWriter.WriteAttributeString("disc", disc);
+                }
+                if (!f.NameFromDisc.Equals(nameFromDisc))
+                {
+                    nameFromDisc = f.NameFromDisc;
+                    xmlWriter.WriteStartElement("nameFromDisc");
+                    xmlWriter.WriteAttributeString("nameFromDisc", nameFromDisc);
+                }
+
+                xmlWriter.WriteStartElement("name");
+                xmlWriter.WriteAttributeString("name", f.Name);
+                    xmlWriter.WriteStartElement("genre");
+                    xmlWriter.WriteAttributeString("genre", f.Genre);
+                    xmlWriter.WriteEndElement();
+                    xmlWriter.WriteStartElement("rating");
+                    xmlWriter.WriteAttributeString("rating", f.Rating);
+                    xmlWriter.WriteEndElement();
+                    xmlWriter.WriteStartElement("description");
+                    xmlWriter.WriteAttributeString("description", f.Description);
+                    xmlWriter.WriteEndElement();
+                    xmlWriter.WriteStartElement("stars");
+                    xmlWriter.WriteAttributeString("stars", f.Stars);
+                    xmlWriter.WriteEndElement();
+                    xmlWriter.WriteStartElement("director");
+                    xmlWriter.WriteAttributeString("director", f.Director);
+                    xmlWriter.WriteEndElement();
+                    xmlWriter.WriteStartElement("duration");
+                    xmlWriter.WriteAttributeString("duration", f.Duration);
+                    xmlWriter.WriteEndElement();
+                    xmlWriter.WriteStartElement("releaseDate");
+                    xmlWriter.WriteAttributeString("releaseDate", f.ReleaseDate);
+                    xmlWriter.WriteEndElement();
+                    xmlWriter.WriteStartElement("url");
+                    xmlWriter.WriteAttributeString("url", f.Url);
+                    xmlWriter.WriteEndElement();
+                    xmlWriter.WriteStartElement("imageSrcDec");
+                    xmlWriter.WriteAttributeString("imageSrcDec", f.ImageSrc);
+                    xmlWriter.WriteEndElement();
+                    xmlWriter.WriteStartElement("imageSrc");
+                    xmlWriter.WriteAttributeString("imageSrc", f.ImageSrc); //TODO: To byte
+                    xmlWriter.WriteEndElement();
+                xmlWriter.WriteEndElement();
+
+                ++i;
+                //Preveriti za nasledje elemente, ali je potrebno zapreti: 1.node za nameFromDisc ali pa 2. node za disk
+                if (i >= movies.Count || !movies[i].NameFromDisc.Equals(nameFromDisc)) { 
+                    xmlWriter.WriteEndElement(); // end node element nameFromDisc
+                }
+                if (i >= movies.Count || !movies[i].Disc.Equals(disc))
+                {
+                    xmlWriter.WriteEndElement(); // end node element disc
+                }
+            }
+            xmlWriter.WriteEndElement(); // End node element "filmi"
+            xmlWriter.Flush();
+
+            return Encoding.ASCII.GetBytes(sb.ToString());
+        }
+
         public static List<Movie> ReadXML(byte[] buffer)
         {
             List<Movie> movies = new List<Movie>();
@@ -127,4 +207,5 @@ namespace VideotecaDotNet_VideotecaDotNetAPI.Service
         }
 
     }
+
 }
